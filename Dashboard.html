@@ -1,0 +1,610 @@
+<!-- Dashboard Component for Material Orders -->
+<div class="dashboard-container">
+  <!-- Dashboard Header -->
+  <div class="row">
+    <div class="col s12">
+      <h5>Material Orders Dashboard</h5>
+      <p class="grey-text">Overview of order activity and statistics</p>
+    </div>
+  </div>
+  
+  <!-- Stats Cards -->
+  <div class="row">
+    <!-- Total Orders -->
+    <div class="col s12 m4">
+      <div class="card-panel light-blue lighten-1 white-text">
+        <div class="center-align">
+          <i class="material-icons medium">shopping_cart</i>
+          <h5 id="totalOrdersCount">--</h5>
+          <p>Total Orders</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Pending Orders -->
+    <div class="col s12 m4">
+      <div class="card-panel amber lighten-1 white-text">
+        <div class="center-align">
+          <i class="material-icons medium">hourglass_empty</i>
+          <h5 id="pendingOrdersCount">--</h5>
+          <p>Pending Orders</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Completed Orders -->
+    <div class="col s12 m4">
+      <div class="card-panel green lighten-1 white-text">
+        <div class="center-align">
+          <i class="material-icons medium">check_circle</i>
+          <h5 id="completedOrdersCount">--</h5>
+          <p>Completed Orders</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Recent Orders -->
+  <div class="row">
+    <div class="col s12">
+      <div class="card">
+        <div class="card-content">
+          <span class="card-title">Recent Orders</span>
+          
+          <table class="striped responsive-table">
+            <thead>
+              <tr>
+                <th>Order #</th>
+                <th>Job</th>
+                <th>Date</th>
+                <th>Vendor</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="recentOrdersTable">
+              <tr class="loading-placeholder">
+                <td colspan="6" class="center-align">Loading recent orders...</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="center-align">
+            <a href="#" id="viewAllOrdersBtn" class="waves-effect waves-light btn-small">
+              View All Orders
+              <i class="material-icons right">arrow_forward</i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Top Jobs & Activity Chart -->
+  <div class="row">
+    <!-- Top Jobs -->
+    <div class="col s12 m6">
+      <div class="card">
+        <div class="card-content">
+          <span class="card-title">Top Jobs by Order Count</span>
+          
+          <table class="striped">
+            <thead>
+              <tr>
+                <th>Job #</th>
+                <th>Job Name</th>
+                <th>Orders</th>
+              </tr>
+            </thead>
+            <tbody id="topJobsTable">
+              <tr class="loading-placeholder">
+                <td colspan="3" class="center-align">Loading top jobs...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Activity Chart -->
+    <div class="col s12 m6">
+      <div class="card">
+        <div class="card-content">
+          <span class="card-title">Monthly Order Activity</span>
+          
+          <div id="orderActivityChart" style="height: 250px;">
+            <div class="loading-placeholder center-align" style="padding-top: 100px;">
+              <div class="preloader-wrapper small active">
+                <div class="spinner-layer spinner-blue-only">
+                  <div class="circle-clipper left">
+                    <div class="circle"></div>
+                  </div>
+                  <div class="gap-patch">
+                    <div class="circle"></div>
+                  </div>
+                  <div class="circle-clipper right">
+                    <div class="circle"></div>
+                  </div>
+                </div>
+              </div>
+              <p>Loading chart data...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Order Details Modal -->
+  <div id="orderDetailsModal" class="modal modal-fixed-footer">
+    <div class="modal-content">
+      <h4>Order Details</h4>
+      <div id="orderDetailsContent">
+        <div class="preloader-wrapper small active">
+          <div class="spinner-layer spinner-blue-only">
+            <div class="circle-clipper left">
+              <div class="circle"></div>
+            </div>
+            <div class="gap-patch">
+              <div class="circle"></div>
+            </div>
+            <div class="circle-clipper right">
+              <div class="circle"></div>
+            </div>
+          </div>
+        </div>
+        <p>Loading order details...</p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
+      <a href="#!" id="printOrderBtn" class="waves-effect waves-light btn">
+        <i class="material-icons left">print</i>Print
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Initialize components
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize modal
+    var modals = document.querySelectorAll('.modal');
+    M.Modal.init(modals);
+    
+    // Load dashboard data
+    loadDashboardData();
+    
+    // Setup event handlers
+    setupEventHandlers();
+  });
+  
+  // Load dashboard data
+  function loadDashboardData() {
+    // Call server function to get dashboard data
+    google.script.run
+      .withSuccessHandler(updateDashboard)
+      .withFailureHandler(handleLoadError)
+      .getDashboardData(user.email, user.role === 'admin');
+  }
+  
+  // Update dashboard with data
+  function updateDashboard(data) {
+    // Update stats counters
+    document.getElementById('totalOrdersCount').textContent = data.orderStats.totalOrders;
+    document.getElementById('pendingOrdersCount').textContent = data.orderStats.pendingOrders;
+    document.getElementById('completedOrdersCount').textContent = data.orderStats.completedOrders;
+    
+    // Update recent orders table
+    updateRecentOrdersTable(data.recentOrders);
+    
+    // Update top jobs table
+    updateTopJobsTable(data.topJobs);
+    
+    // Create activity chart
+    createActivityChart(data.monthlyActivity || generateSampleMonthlyData());
+  }
+  
+  // Update recent orders table
+  function updateRecentOrdersTable(orders) {
+    const tableBody = document.getElementById('recentOrdersTable');
+    tableBody.innerHTML = '';
+    
+    if (orders.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="6" class="center-align">No recent orders found</td></tr>';
+      return;
+    }
+    
+    orders.forEach(order => {
+      const row = document.createElement('tr');
+      
+      // Order number
+      const tdOrderNum = document.createElement('td');
+      tdOrderNum.textContent = order.orderNumber;
+      row.appendChild(tdOrderNum);
+      
+      // Job
+      const tdJob = document.createElement('td');
+      tdJob.textContent = order.jobNumber + ' - ' + order.jobName;
+      row.appendChild(tdJob);
+      
+      // Date
+      const tdDate = document.createElement('td');
+      tdDate.textContent = order.orderDate;
+      row.appendChild(tdDate);
+      
+      // Vendor
+      const tdVendor = document.createElement('td');
+      tdVendor.textContent = order.vendorName;
+      row.appendChild(tdVendor);
+      
+      // Status
+      const tdStatus = document.createElement('td');
+      let statusClass = '';
+      
+      switch (order.status) {
+        case 'Submitted':
+          statusClass = 'blue-text';
+          break;
+        case 'Processing':
+          statusClass = 'amber-text text-darken-2';
+          break;
+        case 'Completed':
+          statusClass = 'green-text';
+          break;
+        case 'Cancelled':
+          statusClass = 'red-text';
+          break;
+        default:
+          statusClass = 'grey-text';
+      }
+      
+      tdStatus.innerHTML = '<span class="' + statusClass + '">' + order.status + '</span>';
+      row.appendChild(tdStatus);
+      
+      // Actions
+      const tdActions = document.createElement('td');
+      const viewBtn = document.createElement('a');
+      viewBtn.href = '#';
+      viewBtn.className = 'btn-small waves-effect waves-light';
+      viewBtn.innerHTML = '<i class="material-icons">visibility</i>';
+      viewBtn.setAttribute('data-order', order.orderNumber);
+      viewBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        viewOrderDetails(order.orderNumber);
+      });
+      
+      tdActions.appendChild(viewBtn);
+      row.appendChild(tdActions);
+      
+      tableBody.appendChild(row);
+    });
+  }
+  
+  // Update top jobs table
+  function updateTopJobsTable(jobs) {
+    const tableBody = document.getElementById('topJobsTable');
+    tableBody.innerHTML = '';
+    
+    if (jobs.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="3" class="center-align">No job data available</td></tr>';
+      return;
+    }
+    
+    jobs.forEach(job => {
+      const row = document.createElement('tr');
+      
+      // Job number
+      const tdJobNum = document.createElement('td');
+      tdJobNum.textContent = job.jobNumber;
+      row.appendChild(tdJobNum);
+      
+      // Job name
+      const tdJobName = document.createElement('td');
+      tdJobName.textContent = job.jobName;
+      row.appendChild(tdJobName);
+      
+      // Order count
+      const tdCount = document.createElement('td');
+      tdCount.textContent = job.count;
+      tdCount.className = 'center-align';
+      row.appendChild(tdCount);
+      
+      tableBody.appendChild(row);
+    });
+  }
+  
+  // Create activity chart
+  function createActivityChart(monthlyData) {
+    const chartContainer = document.getElementById('orderActivityChart');
+    chartContainer.innerHTML = '';
+    
+    // Create canvas element
+    const canvas = document.createElement('canvas');
+    canvas.id = 'activityCanvas';
+    chartContainer.appendChild(canvas);
+    
+    // Prepare data
+    const labels = monthlyData.map(item => item.month);
+    const data = monthlyData.map(item => item.count);
+    
+    // Create chart
+    const ctx = canvas.getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Orders',
+          data: data,
+          backgroundColor: 'rgba(54, 162, 235, 0.5)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0
+            }
+          }
+        }
+      }
+    });
+  }
+  
+  // Generate sample monthly data if not available from server
+  function generateSampleMonthlyData() {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+    return months.map(month => ({
+      month: month,
+      count: Math.floor(Math.random() * 20) + 1
+    }));
+  }
+  
+  // Handle load error
+  function handleLoadError(error) {
+    console.error('Error loading dashboard data:', error);
+    M.toast({html: 'Error loading dashboard data: ' + error.message});
+    
+    // Update with placeholder data
+    document.getElementById('totalOrdersCount').textContent = '0';
+    document.getElementById('pendingOrdersCount').textContent = '0';
+    document.getElementById('completedOrdersCount').textContent = '0';
+    
+    document.getElementById('recentOrdersTable').innerHTML = '<tr><td colspan="6" class="center-align red-text">Error loading order data</td></tr>';
+    document.getElementById('topJobsTable').innerHTML = '<tr><td colspan="3" class="center-align red-text">Error loading job data</td></tr>';
+    
+    // Create empty chart
+    createActivityChart(generateSampleMonthlyData());
+  }
+  
+  // Setup event handlers
+  function setupEventHandlers() {
+    // View all orders button
+    document.getElementById('viewAllOrdersBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      // Implement view all orders functionality
+      M.toast({html: 'View all orders functionality will be implemented soon'});
+    });
+    
+    // Print order button
+    document.getElementById('printOrderBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      printOrderDetails();
+    });
+  }
+  
+  // View order details
+  function viewOrderDetails(orderNumber) {
+    // Show modal
+    const modal = M.Modal.getInstance(document.getElementById('orderDetailsModal'));
+    modal.open();
+    
+    // Reset content
+    document.getElementById('orderDetailsContent').innerHTML = `
+      <div class="center-align" style="padding: 20px;">
+        <div class="preloader-wrapper small active">
+          <div class="spinner-layer spinner-blue-only">
+            <div class="circle-clipper left">
+              <div class="circle"></div>
+            </div>
+            <div class="gap-patch">
+              <div class="circle"></div>
+            </div>
+            <div class="circle-clipper right">
+              <div class="circle"></div>
+            </div>
+          </div>
+        </div>
+        <p>Loading order details...</p>
+      </div>
+    `;
+    
+    // Load order details
+    google.script.run
+      .withSuccessHandler(displayOrderDetails)
+      .withFailureHandler(function(error) {
+        document.getElementById('orderDetailsContent').innerHTML = `
+          <div class="red-text center-align">
+            <i class="material-icons large">error</i>
+            <p>Error loading order details: ${error.message}</p>
+          </div>
+        `;
+      })
+      .getOrderDetails(orderNumber);
+  }
+  
+  // Display order details in modal
+  function displayOrderDetails(orderData) {
+    const container = document.getElementById('orderDetailsContent');
+    
+    // Create HTML content
+    let html = `
+      <div class="order-details">
+        <div class="row">
+          <div class="col s12 m6">
+            <h5>Order #${orderData.header.OrderNumber}</h5>
+            <p><strong>Date:</strong> ${orderData.header.OrderDate}</p>
+            <p><strong>Status:</strong> ${orderData.header.Status}</p>
+          </div>
+          <div class="col s12 m6">
+            <p><strong>Job:</strong> ${orderData.header.JobNumber} - ${orderData.header.JobName}</p>
+            <p><strong>Vendor:</strong> ${orderData.header.VendorName}</p>
+            <p><strong>Ordered By:</strong> ${orderData.header.UserName}</p>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col s12 m6">
+            <h6>Delivery Information</h6>
+            <p><strong>Type:</strong> ${orderData.header.DeliveryType}</p>
+            <p><strong>Address:</strong> ${orderData.header.DeliveryAddress || 'N/A'}</p>
+            <p><strong>Date:</strong> ${orderData.header.DeliveryDate || 'N/A'}</p>
+            <p><strong>Contact:</strong> ${orderData.header.ContactPhone || 'N/A'}</p>
+          </div>
+          <div class="col s12 m6">
+            <h6>Notes</h6>
+            <p>${orderData.header.Notes || 'No notes provided'}</p>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col s12">
+            <h6>Order Items</h6>
+            <table class="striped">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Product</th>
+                  <th>Details</th>
+                  <th>Quantity</th>
+                </tr>
+              </thead>
+              <tbody>
+    `;
+    
+    // Add items
+    if (orderData.items.length === 0) {
+      html += '<tr><td colspan="4" class="center-align">No items found</td></tr>';
+    } else {
+      orderData.items.forEach((item, index) => {
+        html += `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${item.productName || 'Unknown Product'}</td>
+            <td>${formatItemDetails(item)}</td>
+            <td>${item.quantity}</td>
+          </tr>
+        `;
+      });
+    }
+    
+    html += `
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    container.innerHTML = html;
+    
+    // Store order number for printing
+    container.dataset.orderNumber = orderData.header.OrderNumber;
+  }
+  
+  // Format item details for display
+  function formatItemDetails(item) {
+    let details = '';
+    
+    switch (item.category) {
+      case 'paint':
+        if (item.details.color) details += 'Color: ' + item.details.color + '<br>';
+        if (item.details.finish) details += 'Finish: ' + item.details.finish + '<br>';
+        if (item.details.size) details += 'Size: ' + item.details.size;
+        break;
+      case 'sundries':
+        if (item.details.size) details += 'Size: ' + item.details.size + '<br>';
+        if (item.details.unit) details += 'Unit: ' + item.details.unit;
+        break;
+      case 'package':
+        if (item.details.notes) details += 'Notes: ' + item.details.notes;
+        break;
+    }
+    
+    return details || 'N/A';
+  }
+  
+  // Print order details
+  function printOrderDetails() {
+    const content = document.getElementById('orderDetailsContent');
+    const orderNumber = content.dataset.orderNumber;
+    
+    if (!orderNumber) {
+      M.toast({html: 'No order selected for printing'});
+      return;
+    }
+    
+    // Call server function to get PDF
+    google.script.run
+      .withSuccessHandler(function(url) {
+        if (url) {
+          // Open PDF in new window
+          window.open(url, '_blank');
+        } else {
+          M.toast({html: 'Error generating PDF for printing'});
+        }
+      })
+      .withFailureHandler(function(error) {
+        M.toast({html: 'Error printing order: ' + error.message});
+      })
+      .getOrderPdf(orderNumber);
+  }
+  
+  // Refresh dashboard data
+  function refreshDashboard() {
+    // Clear current data
+    document.getElementById('totalOrdersCount').textContent = '--';
+    document.getElementById('pendingOrdersCount').textContent = '--';
+    document.getElementById('completedOrdersCount').textContent = '--';
+    
+    document.getElementById('recentOrdersTable').innerHTML = `
+      <tr class="loading-placeholder">
+        <td colspan="6" class="center-align">Refreshing order data...</td>
+      </tr>
+    `;
+    
+    document.getElementById('topJobsTable').innerHTML = `
+      <tr class="loading-placeholder">
+        <td colspan="3" class="center-align">Refreshing job data...</td>
+      </tr>
+    `;
+    
+    document.getElementById('orderActivityChart').innerHTML = `
+      <div class="loading-placeholder center-align" style="padding-top: 100px;">
+        <div class="preloader-wrapper small active">
+          <div class="spinner-layer spinner-blue-only">
+            <div class="circle-clipper left">
+              <div class="circle"></div>
+            </div>
+            <div class="gap-patch">
+              <div class="circle"></div>
+            </div>
+            <div class="circle-clipper right">
+              <div class="circle"></div>
+            </div>
+          </div>
+        </div>
+        <p>Refreshing chart data...</p>
+      </div>
+    `;
+    
+    // Reload data
+    loadDashboardData();
+  }
+</script>
