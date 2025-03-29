@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+      body {
+        display: flex;
+        min-height: 100vh;
+        flex-direction: column;
+        background-color: #f5f5f5;
+      }
+      main {
+        flex: 1 0 auto;
+        display: flex;
+        align-items: center;
+      }
+      .login-container {
+        margin: 0 auto;
+        max-width: 400px;
+        padding: 20px;
+        border-radius: 4px;
+        background-color: white;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      }
+      .login-logo {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      #errorMessage {
+        color: red;
+        margin-bottom: 10px;
+      }
+      .login-btn {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="container">
+        <div class="login-container">
+          <div class="login-logo">
+            <h4>Order Management System</h4>
+          </div>
+          
+          <div id="errorMessage"></div>
+          
+          <div class="row">
+            <form class="col s12" id="loginForm">
+              <div class="row">
+                <div class="input-field col s12">
+                  <i class="material-icons prefix">person</i>
+                  <input id="username" type="text" class="validate" required>
+                  <label for="username">Username</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12">
+                  <i class="material-icons prefix">lock</i>
+                  <input id="password" type="password" class="validate" required>
+                  <label for="password">Password</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col s12">
+                  <button class="btn waves-effect waves-light login-btn" type="submit">
+                    Login <i class="material-icons right">send</i>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+      // Initialize Materialize components
+      document.addEventListener('DOMContentLoaded', function() {
+        M.AutoInit();
+      });
+      
+      // Handle login form submission
+      document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        
+        // Display loading indication
+        document.querySelector('.login-btn').disabled = true;
+        document.querySelector('.login-btn').innerHTML = 'Logging in... <i class="material-icons right">hourglass_empty</i>';
+        
+        // Call server-side function to process login
+        google.script.run
+          .withSuccessHandler(handleLoginSuccess)
+          .withFailureHandler(handleLoginFailure)
+          .processLogin(username, password);
+      });
+      
+      // Handle successful login
+      function handleLoginSuccess(response) {
+        if (response.success) {
+          // Store user data in session storage
+          sessionStorage.setItem('user', JSON.stringify(response.user));
+          
+          // Redirect to main app with session token
+          window.top.location.href = '?token=' + response.user.sessionToken;
+        } else {
+          // Display error message
+          document.getElementById('errorMessage').innerText = response.message;
+          document.querySelector('.login-btn').disabled = false;
+          document.querySelector('.login-btn').innerHTML = 'Login <i class="material-icons right">send</i>';
+        }
+      }
+      
+      // Handle login failure
+      function handleLoginFailure(error) {
+        document.getElementById('errorMessage').innerText = "Error: " + error.message;
+        document.querySelector('.login-btn').disabled = false;
+        document.querySelector('.login-btn').innerHTML = 'Login <i class="material-icons right">send</i>';
+      }
+    </script>
+  </body>
+</html>
