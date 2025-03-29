@@ -1,0 +1,437 @@
+<!-- User Management Component for Admin Panel -->
+<div class="user-management-container">
+  <!-- Header -->
+  <div class="row">
+    <div class="col s12">
+      <h5>User Management</h5>
+      <p class="grey-text">Manage user accounts and access permissions</p>
+    </div>
+  </div>
+  
+  <!-- User List -->
+  <div class="row">
+    <div class="col s12">
+      <div class="card">
+        <div class="card-content">
+          <div class="card-title">
+            Users
+            <button class="btn-floating btn-small waves-effect waves-light green right" id="addUserBtn">
+              <i class="material-icons">add</i>
+            </button>
+          </div>
+          
+          <div class="user-list-container">
+            <table class="striped responsive-table">
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Last Login</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="userListTable">
+                <tr class="loading-placeholder">
+                  <td colspan="6" class="center-align">Loading users...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- User Form Modal -->
+  <div id="userFormModal" class="modal">
+    <div class="modal-content">
+      <h4 id="userFormTitle">Add New User</h4>
+      
+      <div class="row">
+        <form id="userForm" class="col s12">
+          <input type="hidden" id="userId" name="userId">
+          <input type="hidden" id="formMode" name="formMode" value="add">
+          
+          <div class="row">
+            <div class="input-field col s12 m6">
+              <input id="username" name="username" type="text" class="validate" required>
+              <label for="username">Username</label>
+            </div>
+            
+            <div class="input-field col s12 m6">
+              <input id="password" name="password" type="password" class="validate" required>
+              <label for="password">Password</label>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="input-field col s12 m6">
+              <input id="firstName" name="firstName" type="text" class="validate" required>
+              <label for="firstName">First Name</label>
+            </div>
+            
+            <div class="input-field col s12 m6">
+              <input id="lastName" name="lastName" type="text" class="validate" required>
+              <label for="lastName">Last Name</label>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="input-field col s12 m6">
+              <input id="email" name="email" type="email" class="validate" required>
+              <label for="email">Email</label>
+            </div>
+            
+            <div class="input-field col s12 m6">
+              <select id="role" name="role">
+                <option value="standard">Standard User</option>
+                <option value="admin">Administrator</option>
+              </select>
+              <label>Role</label>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col s12">
+              <div class="switch">
+                <label>
+                  Inactive
+                  <input type="checkbox" id="isActive" name="isActive" checked>
+                  <span class="lever"></span>
+                  Active
+                </label>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <a href="#!" class="modal-close waves-effect waves-light btn-flat">Cancel</a>
+      <button type="submit" form="userForm" class="waves-effect waves-light btn">Save</button>
+    </div>
+  </div>
+  
+  <!-- Delete Confirmation Modal -->
+  <div id="deleteUserModal" class="modal">
+    <div class="modal-content">
+      <h4>Delete User</h4>
+      <p>Are you sure you want to delete the user "<span id="deleteUserName"></span>"?</p>
+      <p class="red-text">This action cannot be undone.</p>
+      <input type="hidden" id="deleteUserId">
+    </div>
+    
+    <div class="modal-footer">
+      <a href="#!" class="modal-close waves-effect waves-light btn-flat">Cancel</a>
+      <a href="#!" id="confirmDeleteBtn" class="modal-close waves-effect waves-light btn red">Delete</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Initialize components
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize select dropdown
+    var selects = document.querySelectorAll('select');
+    M.FormSelect.init(selects);
+    
+    // Initialize modals
+    var modals = document.querySelectorAll('.modal');
+    M.Modal.init(modals);
+    
+    // Load users
+    loadUsers();
+    
+    // Set up event handlers
+    setupEventHandlers();
+  });
+  
+  // Load users from server
+  function loadUsers() {
+    google.script.run
+      .withSuccessHandler(displayUsers)
+      .withFailureHandler(handleLoadError)
+      .getUsers();
+  }
+  
+  // Display users in table
+  function displayUsers(users) {
+    const tableBody = document.getElementById('userListTable');
+    tableBody.innerHTML = '';
+    
+    if (!users || users.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="6" class="center-align">No users found</td></tr>';
+      return;
+    }
+    
+    users.forEach(user => {
+      const row = document.createElement('tr');
+      
+      // Username
+      const tdUsername = document.createElement('td');
+      tdUsername.textContent = user.Username;
+      row.appendChild(tdUsername);
+      
+      // Name
+      const tdName = document.createElement('td');
+      tdName.textContent = user.FirstName + ' ' + user.LastName;
+      row.appendChild(tdName);
+      
+      // Email
+      const tdEmail = document.createElement('td');
+      tdEmail.textContent = user.Email;
+      row.appendChild(tdEmail);
+      
+      // Role
+      const tdRole = document.createElement('td');
+      tdRole.textContent = user.Role === 'admin' ? 'Administrator' : 'Standard User';
+      row.appendChild(tdRole);
+      
+      // Last Login
+      const tdLastLogin = document.createElement('td');
+      tdLastLogin.textContent = user.LastLogin ? new Date(user.LastLogin).toLocaleString() : 'Never';
+      row.appendChild(tdLastLogin);
+      
+      // Actions
+      const tdActions = document.createElement('td');
+      
+      // Edit button
+      const editBtn = document.createElement('a');
+      editBtn.href = '#';
+      editBtn.className = 'btn-small waves-effect waves-light blue';
+      editBtn.innerHTML = '<i class="material-icons">edit</i>';
+      editBtn.setAttribute('data-username', user.Username);
+      editBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        editUser(user);
+      });
+      
+      // Delete button
+      const deleteBtn = document.createElement('a');
+      deleteBtn.href = '#';
+      deleteBtn.className = 'btn-small waves-effect waves-light red';
+      deleteBtn.innerHTML = '<i class="material-icons">delete</i>';
+      deleteBtn.setAttribute('data-username', user.Username);
+      deleteBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        confirmDeleteUser(user);
+      });
+      
+      tdActions.appendChild(editBtn);
+      tdActions.appendChild(document.createTextNode(' '));
+      tdActions.appendChild(deleteBtn);
+      
+      row.appendChild(tdActions);
+      
+      tableBody.appendChild(row);
+    });
+  }
+  
+  // Handle load error
+  function handleLoadError(error) {
+    console.error('Error loading users:', error);
+    
+    const tableBody = document.getElementById('userListTable');
+    tableBody.innerHTML = '<tr><td colspan="6" class="center-align red-text">Error loading users: ' + error.message + '</td></tr>';
+    
+    M.toast({html: 'Error loading users: ' + error.message});
+  }
+  
+  // Setup event handlers
+  function setupEventHandlers() {
+    // Add user button
+    document.getElementById('addUserBtn').addEventListener('click', showAddUserForm);
+    
+    // User form submission
+    document.getElementById('userForm').addEventListener('submit', saveUser);
+    
+    // Delete confirmation
+    document.getElementById('confirmDeleteBtn').addEventListener('click', deleteUser);
+  }
+  
+  // Show add user form
+  function showAddUserForm() {
+    // Reset form
+    document.getElementById('userForm').reset();
+    document.getElementById('userId').value = '';
+    document.getElementById('formMode').value = 'add';
+    
+    // Update modal title
+    document.getElementById('userFormTitle').textContent = 'Add New User';
+    
+    // Show password field
+    document.getElementById('password').required = true;
+    document.getElementById('password').parentElement.style.display = 'block';
+    
+    // Update form fields
+    M.updateTextFields();
+    
+    // Reinitialize select
+    M.FormSelect.init(document.getElementById('role'));
+    
+    // Open modal
+    M.Modal.getInstance(document.getElementById('userFormModal')).open();
+  }
+  
+  // Edit user
+  function editUser(user) {
+    // Reset form
+    document.getElementById('userForm').reset();
+    
+    // Set form mode
+    document.getElementById('formMode').value = 'edit';
+    document.getElementById('userId').value = user.Username;
+    
+    // Update modal title
+    document.getElementById('userFormTitle').textContent = 'Edit User';
+    
+    // Hide password field (not required for edit)
+    document.getElementById('password').required = false;
+    document.getElementById('password').parentElement.style.display = 'none';
+    
+    // Fill form fields
+    document.getElementById('username').value = user.Username;
+    document.getElementById('username').disabled = true; // Username can't be changed
+    document.getElementById('firstName').value = user.FirstName;
+    document.getElementById('lastName').value = user.LastName;
+    document.getElementById('email').value = user.Email;
+    document.getElementById('role').value = user.Role;
+    document.getElementById('isActive').checked = user.IsActive !== false; // Default to true if not specified
+    
+    // Update form fields
+    M.updateTextFields();
+    
+    // Reinitialize select
+    M.FormSelect.init(document.getElementById('role'));
+    
+    // Open modal
+    M.Modal.getInstance(document.getElementById('userFormModal')).open();
+  }
+  
+  // Confirm delete user
+  function confirmDeleteUser(user) {
+    document.getElementById('deleteUserName').textContent = user.Username;
+    document.getElementById('deleteUserId').value = user.Username;
+    
+    M.Modal.getInstance(document.getElementById('deleteUserModal')).open();
+  }
+  
+  // Save user
+  function saveUser(e) {
+    e.preventDefault();
+    
+    const formMode = document.getElementById('formMode').value;
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const firstName = document.getElementById('firstName').value;
+    const lastName = document.getElementById('lastName').value;
+    const email = document.getElementById('email').value;
+    const role = document.getElementById('role').value;
+    const isActive = document.getElementById('isActive').checked;
+    
+    // Validate form
+    if (!username || (formMode === 'add' && !password) || !firstName || !lastName || !email) {
+      M.toast({html: 'Please fill out all required fields'});
+      return;
+    }
+    
+    // Construct user object
+    const userData = {
+      Username: username,
+      FirstName: firstName,
+      LastName: lastName,
+      Email: email,
+      Role: role,
+      IsActive: isActive
+    };
+    
+    // Add password only for new users or if changed
+    if (password) {
+      userData.Password = password;
+    }
+    
+    // Disable submit button
+    const submitBtn = document.querySelector('#userFormModal .modal-footer button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="material-icons right">hourglass_empty</i> Saving...';
+    
+    // Save user
+    if (formMode === 'add') {
+      google.script.run
+        .withSuccessHandler(function(result) {
+          handleSaveSuccess(result, 'User added successfully');
+        })
+        .withFailureHandler(function(error) {
+          handleSaveError(error, submitBtn, originalText);
+        })
+        .addUser(userData);
+    } else {
+      google.script.run
+        .withSuccessHandler(function(result) {
+          handleSaveSuccess(result, 'User updated successfully');
+        })
+        .withFailureHandler(function(error) {
+          handleSaveError(error, submitBtn, originalText);
+        })
+        .updateUser(userData);
+    }
+  }
+  
+  // Handle save success
+  function handleSaveSuccess(result, message) {
+    if (result.success) {
+      // Close modal
+      M.Modal.getInstance(document.getElementById('userFormModal')).close();
+      
+      // Show success message
+      M.toast({html: message});
+      
+      // Reload users
+      loadUsers();
+    } else {
+      // Show error message
+      M.toast({html: 'Error: ' + result.message});
+      
+      // Re-enable submit button
+      const submitBtn = document.querySelector('#userFormModal .modal-footer button[type="submit"]');
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = 'Save';
+    }
+  }
+  
+  // Handle save error
+  function handleSaveError(error, submitBtn, originalText) {
+    console.error('Error saving user:', error);
+    
+    // Show error message
+    M.toast({html: 'Error saving user: ' + error.message});
+    
+    // Re-enable submit button
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalText;
+  }
+  
+  // Delete user
+  function deleteUser() {
+    const username = document.getElementById('deleteUserId').value;
+    
+    google.script.run
+      .withSuccessHandler(function(result) {
+        if (result.success) {
+          M.toast({html: 'User deleted successfully'});
+          loadUsers();
+        } else {
+          M.toast({html: 'Error: ' + result.message});
+        }
+      })
+      .withFailureHandler(function(error) {
+        console.error('Error deleting user:', error);
+        M.toast({html: 'Error deleting user: ' + error.message});
+      })
+      .deleteUser(username);
+  }
+</script>
