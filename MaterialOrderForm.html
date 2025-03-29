@@ -1,0 +1,749 @@
+<!-- Material Order Form -->
+<div class="row">
+  <form class="col s12" id="materialOrderForm">
+    <div class="card">
+      <div class="card-content">
+        <span class="card-title">New Material Order</span>
+        
+        <!-- Job Information Section -->
+        <div class="section">
+          <h6>Job Information</h6>
+          
+          <div class="row">
+            <div class="input-field col s12 m6">
+              <input id="jobNumber" type="text" class="autocomplete" required>
+              <label for="jobNumber">Job Number</label>
+            </div>
+            
+            <div class="input-field col s12 m6">
+              <input id="jobName" type="text" required>
+              <label for="jobName">Job Name</label>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="input-field col s12 m6">
+              <select id="vendor" required>
+                <option value="" disabled selected>Choose Vendor</option>
+                <!-- Vendor options will be populated dynamically -->
+              </select>
+              <label>Vendor</label>
+            </div>
+            
+            <div class="input-field col s12 m6">
+              <select id="deliveryType" required>
+                <option value="" disabled selected>Choose Delivery Type</option>
+                <option value="delivery">Delivery</option>
+                <option value="willCall">Will Call</option>
+              </select>
+              <label>Delivery Type</label>
+            </div>
+          </div>
+          
+          <div class="row delivery-fields" style="display:none;">
+            <div class="input-field col s12">
+              <textarea id="deliveryAddress" class="materialize-textarea"></textarea>
+              <label for="deliveryAddress">Delivery Address</label>
+            </div>
+            
+            <div class="input-field col s12 m6">
+              <input id="deliveryDate" type="text" class="datepicker">
+              <label for="deliveryDate">Requested Delivery Date</label>
+            </div>
+            
+            <div class="input-field col s12 m6">
+              <input id="contactPhone" type="tel" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}">
+              <label for="contactPhone">Contact Phone (123-456-7890)</label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Products Section -->
+        <div class="section">
+          <h6>Products</h6>
+          
+          <div class="row">
+            <div class="input-field col s12 m6">
+              <select id="productCategory" required>
+                <option value="" disabled selected>Choose Category</option>
+                <option value="paint">Paint</option>
+                <option value="sundries">Sundries</option>
+                <option value="package">Custom Package</option>
+              </select>
+              <label>Product Category</label>
+            </div>
+            
+            <div class="input-field col s12 m6 product-selector" id="paintSelector" style="display:none;">
+              <select id="paintProduct" class="product-select">
+                <option value="" disabled selected>Select Paint</option>
+                <!-- Paint options will be populated dynamically -->
+              </select>
+              <label>Paint Product</label>
+            </div>
+            
+            <div class="input-field col s12 m6 product-selector" id="sundriesSelector" style="display:none;">
+              <select id="sundriesProduct" class="product-select">
+                <option value="" disabled selected>Select Sundries</option>
+                <!-- Sundries options will be populated dynamically -->
+              </select>
+              <label>Sundries Product</label>
+            </div>
+            
+            <div class="input-field col s12 m6 product-selector" id="packageSelector" style="display:none;">
+              <select id="packageProduct" class="product-select">
+                <option value="" disabled selected>Select Package</option>
+                <!-- Package options will be populated dynamically -->
+              </select>
+              <label>Custom Package</label>
+            </div>
+          </div>
+          
+          <!-- Product Details Section -->
+          <div id="productDetails">
+            <!-- Paint Details -->
+            <div class="paint-details product-details" style="display:none;">
+              <div class="row">
+                <div class="input-field col s12 m4">
+                  <input id="paintColor" type="text" class="validate">
+                  <label for="paintColor">Color</label>
+                </div>
+                
+                <div class="input-field col s12 m4">
+                  <select id="paintFinish">
+                    <option value="" disabled selected>Select Finish</option>
+                    <option value="flat">Flat</option>
+                    <option value="eggshell">Eggshell</option>
+                    <option value="satin">Satin</option>
+                    <option value="semi-gloss">Semi-Gloss</option>
+                    <option value="gloss">Gloss</option>
+                  </select>
+                  <label>Finish</label>
+                </div>
+                
+                <div class="input-field col s12 m4">
+                  <select id="paintSize">
+                    <option value="" disabled selected>Select Size</option>
+                    <option value="quart">Quart</option>
+                    <option value="gallon">Gallon</option>
+                    <option value="fiveGallon">5 Gallon</option>
+                  </select>
+                  <label>Size</label>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Sundries Details -->
+            <div class="sundries-details product-details" style="display:none;">
+              <div class="row">
+                <div class="input-field col s12 m6">
+                  <input id="sundriesSize" type="text" class="validate">
+                  <label for="sundriesSize">Size/Specification</label>
+                </div>
+                
+                <div class="input-field col s12 m6">
+                  <select id="sundriesUnit">
+                    <option value="" disabled selected>Select Unit</option>
+                    <option value="each">Each</option>
+                    <option value="box">Box</option>
+                    <option value="case">Case</option>
+                    <option value="roll">Roll</option>
+                  </select>
+                  <label>Unit</label>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Package Details -->
+            <div class="package-details product-details" style="display:none;">
+              <div class="row">
+                <div class="input-field col s12">
+                  <textarea id="packageNotes" class="materialize-textarea"></textarea>
+                  <label for="packageNotes">Special Instructions</label>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Quantity Section -->
+          <div class="row">
+            <div class="input-field col s12 m6">
+              <input id="quantity" type="number" min="1" value="1" required>
+              <label for="quantity">Quantity</label>
+            </div>
+            
+            <div class="col s12 m6">
+              <button type="button" class="btn waves-effect waves-light" id="addProductBtn">
+                Add to Order
+                <i class="material-icons right">add_shopping_cart</i>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Order Items List -->
+          <div class="section">
+            <h6>Order Items</h6>
+            <table class="striped responsive-table" id="orderItemsTable">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Details</th>
+                  <th>Quantity</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="orderItemsList">
+                <!-- Order items will be added here dynamically -->
+              </tbody>
+            </table>
+            
+            <div id="emptyOrderMessage" class="center-align grey-text">
+              <p>No items added to the order yet.</p>
+            </div>
+          </div>
+          
+          <!-- Notes Section -->
+          <div class="section">
+            <div class="row">
+              <div class="input-field col s12">
+                <textarea id="orderNotes" class="materialize-textarea"></textarea>
+                <label for="orderNotes">Order Notes</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Submit Button -->
+        <div class="card-action">
+          <button type="submit" class="btn waves-effect waves-light" id="submitOrderBtn" disabled>
+            Submit Order
+            <i class="material-icons right">send</i>
+          </button>
+          <button type="button" class="btn waves-effect waves-light red lighten-2" id="clearOrderBtn">
+            Clear
+            <i class="material-icons right">clear</i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+  // Initialize form components
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize select dropdowns
+    var selects = document.querySelectorAll('select');
+    M.FormSelect.init(selects);
+    
+    // Initialize datepicker
+    var datePickers = document.querySelectorAll('.datepicker');
+    M.Datepicker.init(datePickers, {
+      format: 'yyyy-mm-dd',
+      minDate: new Date(),
+      defaultDate: new Date(),
+      setDefaultDate: true
+    });
+    
+    // Initialize textarea
+    var textAreas = document.querySelectorAll('.materialize-textarea');
+    M.textareaAutoResize(textAreas);
+    
+    // Initialize autocomplete for job numbers
+    var jobNumberInput = document.getElementById('jobNumber');
+    initJobNumberAutocomplete(jobNumberInput);
+    
+    // Load vendors and products
+    loadVendors();
+    
+    // Setup event listeners
+    setupEventListeners();
+  });
+  
+  // Initialize job number autocomplete
+  function initJobNumberAutocomplete(input) {
+    // Call server function to get job numbers
+    google.script.run
+      .withSuccessHandler(function(jobData) {
+        var autocompleteData = {};
+        
+        // Format data for autocomplete
+        jobData.forEach(function(job) {
+          autocompleteData[job.number] = null; // Using null as per Materialize docs
+        });
+        
+        // Initialize autocomplete
+        M.Autocomplete.init(input, {
+          data: autocompleteData,
+          onAutocomplete: function(jobNumber) {
+            // Find job data
+            var selectedJob = jobData.find(job => job.number === jobNumber);
+            if (selectedJob) {
+              // Fill job name
+              document.getElementById('jobName').value = selectedJob.name;
+              // Activate label
+              M.updateTextFields();
+            }
+          }
+        });
+      })
+      .withFailureHandler(function(error) {
+        console.error('Error loading job numbers:', error);
+        M.toast({html: 'Error loading job data. Please try again.'});
+      })
+      .getJobNumbers();
+  }
+  
+  // Load vendors from server
+  function loadVendors() {
+    google.script.run
+      .withSuccessHandler(function(vendors) {
+        var vendorSelect = document.getElementById('vendor');
+        
+        // Clear existing options except first
+        while (vendorSelect.options.length > 1) {
+          vendorSelect.remove(1);
+        }
+        
+        // Add vendor options
+        vendors.forEach(function(vendor) {
+          var option = document.createElement('option');
+          option.value = vendor.id;
+          option.textContent = vendor.name;
+          vendorSelect.appendChild(option);
+        });
+        
+        // Reinitialize select
+        M.FormSelect.init(vendorSelect);
+      })
+      .withFailureHandler(function(error) {
+        console.error('Error loading vendors:', error);
+        M.toast({html: 'Error loading vendor data. Please try again.'});
+      })
+      .getVendors();
+  }
+  
+  // Load products based on vendor and category
+  function loadProducts(vendorId, category) {
+    if (!vendorId || !category) return;
+    
+    var selectId = category + 'Product';
+    var productSelect = document.getElementById(selectId);
+    
+    google.script.run
+      .withSuccessHandler(function(products) {
+        // Clear existing options except first
+        while (productSelect.options.length > 1) {
+          productSelect.remove(1);
+        }
+        
+        // Add product options
+        products.forEach(function(product) {
+          var option = document.createElement('option');
+          option.value = product.id;
+          option.textContent = product.name;
+          productSelect.appendChild(option);
+        });
+        
+        // Reinitialize select
+        M.FormSelect.init(productSelect);
+      })
+      .withFailureHandler(function(error) {
+        console.error('Error loading products:', error);
+        M.toast({html: 'Error loading product data. Please try again.'});
+      })
+      .getProducts(vendorId, category);
+  }
+  
+  // Setup event listeners
+  function setupEventListeners() {
+    // Delivery type change
+    var deliveryType = document.getElementById('deliveryType');
+    deliveryType.addEventListener('change', function() {
+      var deliveryFields = document.querySelector('.delivery-fields');
+      
+      if (this.value === 'delivery') {
+        deliveryFields.style.display = 'block';
+      } else {
+        deliveryFields.style.display = 'none';
+      }
+    });
+    
+    // Vendor change
+    var vendor = document.getElementById('vendor');
+    vendor.addEventListener('change', function() {
+      var category = document.getElementById('productCategory').value;
+      
+      if (category) {
+        loadProducts(this.value, category);
+      }
+    });
+    
+    // Product category change
+    var productCategory = document.getElementById('productCategory');
+    productCategory.addEventListener('change', function() {
+      // Hide all product selectors and details
+      var selectors = document.querySelectorAll('.product-selector');
+      selectors.forEach(function(selector) {
+        selector.style.display = 'none';
+      });
+      
+      var details = document.querySelectorAll('.product-details');
+      details.forEach(function(detail) {
+        detail.style.display = 'none';
+      });
+      
+      // Show selected category selector
+      var selectedSelector = document.getElementById(this.value + 'Selector');
+      if (selectedSelector) {
+        selectedSelector.style.display = 'block';
+      }
+      
+      // Show selected category details
+      var selectedDetails = document.querySelector('.' + this.value + '-details');
+      if (selectedDetails) {
+        selectedDetails.style.display = 'block';
+      }
+      
+      // Load products if vendor is selected
+      var vendorId = document.getElementById('vendor').value;
+      if (vendorId) {
+        loadProducts(vendorId, this.value);
+      }
+    });
+    
+    // Add product button
+    var addProductBtn = document.getElementById('addProductBtn');
+    addProductBtn.addEventListener('click', addProductToOrder);
+    
+    // Clear order button
+    var clearOrderBtn = document.getElementById('clearOrderBtn');
+    clearOrderBtn.addEventListener('click', clearOrder);
+    
+    // Form submission
+    var orderForm = document.getElementById('materialOrderForm');
+    orderForm.addEventListener('submit', submitOrder);
+  }
+  
+  // Add product to order
+  function addProductToOrder() {
+    var category = document.getElementById('productCategory').value;
+    if (!category) {
+      M.toast({html: 'Please select a product category'});
+      return;
+    }
+    
+    var productSelect = document.getElementById(category + 'Product');
+    var productId = productSelect.value;
+    var productName = productSelect.options[productSelect.selectedIndex].text;
+    
+    if (!productId) {
+      M.toast({html: 'Please select a product'});
+      return;
+    }
+    
+    var quantity = document.getElementById('quantity').value;
+    if (!quantity || quantity < 1) {
+      M.toast({html: 'Please enter a valid quantity'});
+      return;
+    }
+    
+    // Get product details based on category
+    var details = getProductDetails(category);
+    
+    // Create table row
+    var tr = document.createElement('tr');
+    tr.dataset.productId = productId;
+    tr.dataset.category = category;
+    tr.dataset.details = JSON.stringify(details);
+    tr.dataset.quantity = quantity;
+    
+    // Product name cell
+    var tdProduct = document.createElement('td');
+    tdProduct.textContent = productName;
+    tr.appendChild(tdProduct);
+    
+    // Details cell
+    var tdDetails = document.createElement('td');
+    tdDetails.textContent = formatDetails(category, details);
+    tr.appendChild(tdDetails);
+    
+    // Quantity cell
+    var tdQuantity = document.createElement('td');
+    tdQuantity.textContent = quantity;
+    tr.appendChild(tdQuantity);
+    
+    // Actions cell
+    var tdActions = document.createElement('td');
+    var removeBtn = document.createElement('button');
+    removeBtn.className = 'btn-small waves-effect waves-light red';
+    removeBtn.innerHTML = '<i class="material-icons">delete</i>';
+    removeBtn.addEventListener('click', function() {
+      tr.remove();
+      updateOrderTable();
+    });
+    tdActions.appendChild(removeBtn);
+    tr.appendChild(tdActions);
+    
+    // Add to table
+    document.getElementById('orderItemsList').appendChild(tr);
+    
+    // Update table visibility
+    updateOrderTable();
+    
+    // Reset product form fields
+    resetProductFields();
+    
+    M.toast({html: 'Product added to order'});
+  }
+  
+  // Get product details based on category
+  function getProductDetails(category) {
+    var details = {};
+    
+    switch (category) {
+      case 'paint':
+        details.color = document.getElementById('paintColor').value;
+        details.finish = document.getElementById('paintFinish').value;
+        details.size = document.getElementById('paintSize').value;
+        break;
+      case 'sundries':
+        details.size = document.getElementById('sundriesSize').value;
+        details.unit = document.getElementById('sundriesUnit').value;
+        break;
+      case 'package':
+        details.notes = document.getElementById('packageNotes').value;
+        break;
+    }
+    
+    return details;
+  }
+  
+  // Format details for display
+  function formatDetails(category, details) {
+    var formattedDetails = '';
+    
+    switch (category) {
+      case 'paint':
+        if (details.color) formattedDetails += 'Color: ' + details.color + ', ';
+        if (details.finish) formattedDetails += 'Finish: ' + details.finish + ', ';
+        if (details.size) formattedDetails += 'Size: ' + details.size;
+        break;
+      case 'sundries':
+        if (details.size) formattedDetails += 'Size: ' + details.size + ', ';
+        if (details.unit) formattedDetails += 'Unit: ' + details.unit;
+        break;
+      case 'package':
+        if (details.notes) formattedDetails += 'Notes: ' + details.notes;
+        break;
+    }
+    
+    return formattedDetails || 'N/A';
+  }
+  
+  // Reset product fields
+  function resetProductFields() {
+    document.getElementById('productCategory').value = '';
+    M.FormSelect.init(document.getElementById('productCategory'));
+    
+    // Hide all product selectors and details
+    var selectors = document.querySelectorAll('.product-selector');
+    selectors.forEach(function(selector) {
+      selector.style.display = 'none';
+    });
+    
+    var details = document.querySelectorAll('.product-details');
+    details.forEach(function(detail) {
+      detail.style.display = 'none';
+    });
+    
+    // Reset specific fields
+    document.getElementById('paintColor').value = '';
+    document.getElementById('paintFinish').value = '';
+    document.getElementById('paintSize').value = '';
+    document.getElementById('sundriesSize').value = '';
+    document.getElementById('sundriesUnit').value = '';
+    document.getElementById('packageNotes').value = '';
+    
+    // Reset quantity
+    document.getElementById('quantity').value = '1';
+    
+    // Update text fields
+    M.updateTextFields();
+    
+    // Reinitialize select fields
+    M.FormSelect.init(document.querySelectorAll('select'));
+  }
+  
+  // Update order table visibility
+  function updateOrderTable() {
+    var tableBody = document.getElementById('orderItemsList');
+    var emptyMessage = document.getElementById('emptyOrderMessage');
+    var submitBtn = document.getElementById('submitOrderBtn');
+    
+    if (tableBody.children.length > 0) {
+      emptyMessage.style.display = 'none';
+      submitBtn.disabled = false;
+    } else {
+      emptyMessage.style.display = 'block';
+      submitBtn.disabled = true;
+    }
+  }
+  
+  // Clear the entire order
+  function clearOrder() {
+    if (confirm('Are you sure you want to clear this order? All items will be removed.')) {
+      document.getElementById('orderItemsList').innerHTML = '';
+      updateOrderTable();
+      
+      // Reset job information
+      document.getElementById('jobNumber').value = '';
+      document.getElementById('jobName').value = '';
+      document.getElementById('vendor').value = '';
+      document.getElementById('deliveryType').value = '';
+      document.getElementById('deliveryAddress').value = '';
+      document.getElementById('deliveryDate').value = '';
+      document.getElementById('contactPhone').value = '';
+      document.getElementById('orderNotes').value = '';
+      
+      // Hide delivery fields
+      document.querySelector('.delivery-fields').style.display = 'none';
+      
+      // Reset product fields
+      resetProductFields();
+      
+      // Update form fields
+      M.updateTextFields();
+      M.FormSelect.init(document.querySelectorAll('select'));
+      
+      M.toast({html: 'Order cleared'});
+    }
+  }
+  
+  // Submit the order
+  function submitOrder(e) {
+    e.preventDefault();
+    
+    // Validate form
+    if (!validateOrderForm()) {
+      return;
+    }
+    
+    // Get order items
+    var orderItems = [];
+    var rows = document.getElementById('orderItemsList').children;
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      orderItems.push({
+        productId: row.dataset.productId,
+        category: row.dataset.category,
+        details: JSON.parse(row.dataset.details),
+        quantity: parseInt(row.dataset.quantity)
+      });
+    }
+    
+    // Build order data
+    var orderData = {
+      jobNumber: document.getElementById('jobNumber').value,
+      jobName: document.getElementById('jobName').value,
+      vendor: {
+        id: document.getElementById('vendor').value,
+        name: document.getElementById('vendor').options[document.getElementById('vendor').selectedIndex].text
+      },
+      deliveryType: document.getElementById('deliveryType').value,
+      deliveryAddress: document.getElementById('deliveryAddress').value,
+      deliveryDate: document.getElementById('deliveryDate').value,
+      contactPhone: document.getElementById('contactPhone').value,
+      notes: document.getElementById('orderNotes').value,
+      items: orderItems,
+      user: {
+        name: user.firstName + ' ' + user.lastName,
+        email: user.email
+      }
+    };
+    
+    // Disable submit button and show loading
+    var submitBtn = document.getElementById('submitOrderBtn');
+    var originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="material-icons right">hourglass_empty</i> Processing...';
+    
+    // Submit order to server
+    google.script.run
+      .withSuccessHandler(function(response) {
+        if (response.success) {
+          M.toast({html: 'Order submitted successfully!'});
+          
+          // Clear the form
+          clearOrder();
+          
+          // Show order details modal if available
+          if (response.orderNumber) {
+            showOrderConfirmation(response.orderNumber);
+          }
+        } else {
+          M.toast({html: 'Error: ' + response.message});
+          
+          // Re-enable submit button
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
+        }
+      })
+      .withFailureHandler(function(error) {
+        console.error('Error submitting order:', error);
+        M.toast({html: 'Error submitting order. Please try again.'});
+        
+        // Re-enable submit button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      })
+      .submitMaterialOrder(orderData);
+  }
+  
+  // Validate the order form
+  function validateOrderForm() {
+    // Basic validation
+    var requiredFields = [
+      { id: 'jobNumber', name: 'Job Number' },
+      { id: 'jobName', name: 'Job Name' },
+      { id: 'vendor', name: 'Vendor' },
+      { id: 'deliveryType', name: 'Delivery Type' }
+    ];
+    
+    for (var i = 0; i < requiredFields.length; i++) {
+      var field = requiredFields[i];
+      var value = document.getElementById(field.id).value;
+      
+      if (!value) {
+        M.toast({html: field.name + ' is required'});
+        return false;
+      }
+    }
+    
+    // Delivery-specific validation
+    if (document.getElementById('deliveryType').value === 'delivery') {
+      if (!document.getElementById('deliveryAddress').value) {
+        M.toast({html: 'Delivery Address is required'});
+        return false;
+      }
+      
+      if (!document.getElementById('deliveryDate').value) {
+        M.toast({html: 'Delivery Date is required'});
+        return false;
+      }
+    }
+    
+    // Validate order items
+    if (document.getElementById('orderItemsList').children.length === 0) {
+      M.toast({html: 'Please add at least one product to the order'});
+      return false;
+    }
+    
+    return true;
+  }
+  
+  // Show order confirmation
+  function showOrderConfirmation(orderNumber) {
+    // Here you would typically show a modal with order details
+    M.toast({html: 'Order #' + orderNumber + ' has been created', displayLength: 6000});
+  }
+</script>
