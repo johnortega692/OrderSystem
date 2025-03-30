@@ -172,27 +172,27 @@
       
       // Username
       const tdUsername = document.createElement('td');
-      tdUsername.textContent = user.Username;
+      tdUsername.textContent = loggedInUser.Username;
       row.appendChild(tdUsername);
       
       // Name
       const tdName = document.createElement('td');
-      tdName.textContent = user.FirstName + ' ' + user.LastName;
+      tdName.textContent = loggedInUser.FirstName + ' ' + loggedInUser.LastName;
       row.appendChild(tdName);
       
       // Email
       const tdEmail = document.createElement('td');
-      tdEmail.textContent = user.Email;
+      tdEmail.textContent = loggedInUser.Email;
       row.appendChild(tdEmail);
       
       // Role
       const tdRole = document.createElement('td');
-      tdRole.textContent = user.Role === 'admin' ? 'Administrator' : 'Standard User';
+      tdRole.textContent = loggedInUser.Role === 'admin' ? 'Administrator' : 'Standard User';
       row.appendChild(tdRole);
       
       // Last Login
       const tdLastLogin = document.createElement('td');
-      tdLastLogin.textContent = user.LastLogin ? new Date(user.LastLogin).toLocaleString() : 'Never';
+      tdLastLogin.textContent = loggedInUser.LastLogin ? new Date(loggedInUser.LastLogin).toLocaleString() : 'Never';
       row.appendChild(tdLastLogin);
       
       // Actions
@@ -203,7 +203,7 @@
       editBtn.href = '#';
       editBtn.className = 'btn-small waves-effect waves-light blue';
       editBtn.innerHTML = '<i class="material-icons">edit</i>';
-      editBtn.setAttribute('data-username', user.Username);
+      editBtn.setAttribute('data-username', loggedInUser.Username);
       editBtn.addEventListener('click', function(e) {
         e.preventDefault();
         editUser(user);
@@ -214,7 +214,7 @@
       deleteBtn.href = '#';
       deleteBtn.className = 'btn-small waves-effect waves-light red';
       deleteBtn.innerHTML = '<i class="material-icons">delete</i>';
-      deleteBtn.setAttribute('data-username', user.Username);
+      deleteBtn.setAttribute('data-username', loggedInUser.Username);
       deleteBtn.addEventListener('click', function(e) {
         e.preventDefault();
         confirmDeleteUser(user);
@@ -283,7 +283,7 @@
     
     // Set form mode
     document.getElementById('formMode').value = 'edit';
-    document.getElementById('userId').value = user.Username;
+    document.getElementById('userId').value = loggedInUser.Username;
     
     // Update modal title
     document.getElementById('userFormTitle').textContent = 'Edit User';
@@ -293,13 +293,13 @@
     document.getElementById('password').parentElement.style.display = 'none';
     
     // Fill form fields
-    document.getElementById('username').value = user.Username;
+    document.getElementById('username').value = loggedInUser.Username;
     document.getElementById('username').disabled = true; // Username can't be changed
-    document.getElementById('firstName').value = user.FirstName;
-    document.getElementById('lastName').value = user.LastName;
-    document.getElementById('email').value = user.Email;
-    document.getElementById('role').value = user.Role;
-    document.getElementById('isActive').checked = user.IsActive !== false; // Default to true if not specified
+    document.getElementById('firstName').value = loggedInUser.FirstName;
+    document.getElementById('lastName').value = loggedInUser.LastName;
+    document.getElementById('email').value = loggedInUser.Email;
+    document.getElementById('role').value = loggedInUser.Role;
+    document.getElementById('isActive').checked = loggedInUser.IsActive !== false; // Default to true if not specified
     
     // Update form fields
     M.updateTextFields();
@@ -313,8 +313,8 @@
   
   // Confirm delete user
   function confirmDeleteUser(user) {
-    document.getElementById('deleteUserName').textContent = user.Username;
-    document.getElementById('deleteUserId').value = user.Username;
+    document.getElementById('deleteUserName').textContent = loggedInUser.Username;
+    document.getElementById('deleteUserId').value = loggedInUser.Username;
     
     M.Modal.getInstance(document.getElementById('deleteUserModal')).open();
   }
