@@ -3,29 +3,16 @@
   <head>
     <base target="_top">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
     <style>
-      body {
-        display: flex;
-        min-height: 100vh;
-        flex-direction: column;
-      }
-      main {
-        flex: 1 0 auto;
-        padding: 20px 0;
-      }
-      .sidenav-header {
-        padding: 20px 16px;
-        background-color: #ee6e73;
-        color: white;
-      }
-      .user-info {
-        padding: 10px 16px;
-        border-bottom: 1px solid #e0e0e0;
-      }
+      body { display: flex; min-height: 100vh; flex-direction: column; }
+      main { flex: 1 0 auto; padding: 20px 0; }
+      .sidenav-header { padding: 20px 16px; background-color: #ee6e73; color: white; }
+      .user-info { padding: 10px 16px; border-bottom: 1px solid #e0e0e0; }
       .module-card {
         height: 200px;
         display: flex;
@@ -38,13 +25,8 @@
         transform: translateY(-5px);
         box-shadow: 0 8px 17px 2px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12), 0 5px 5px -3px rgba(0,0,0,0.2);
       }
-      .module-card i {
-        font-size: 48px;
-        margin-bottom: 10px;
-      }
-      .admin-only {
-        position: relative;
-      }
+      .module-card i { font-size: 48px; margin-bottom: 10px; }
+      .admin-only { position: relative; }
       .admin-badge {
         position: absolute;
         top: 5px;
@@ -66,17 +48,9 @@
         z-index: 1000;
         display: none;
       }
-      
-      /* For smaller screens */
-      @media only screen and (max-width: 992px) {
-        .module-card {
-          height: 150px;
-        }
-      }
     </style>
   </head>
   <body>
-    <!-- Top Navigation Bar -->
     <nav class="nav-extended">
       <div class="nav-wrapper">
         <a href="#" class="brand-logo center">Order Management System</a>
@@ -85,80 +59,64 @@
           <li><a href="#" id="logoutBtn"><i class="material-icons left">exit_to_app</i>Logout</a></li>
         </ul>
       </div>
-      
       <div class="nav-content">
         <ul class="tabs tabs-transparent">
           <li class="tab"><a href="#dashboard" class="active">Dashboard</a></li>
           <li class="tab"><a href="#material-orders">Material Orders</a></li>
-          <li class="tab admin-tab" style="<?= user.role !== 'admin' ? 'display:none' : '' ?>">
+          <li class="tab admin-tab" style="<?!= user.role !== 'admin' ? 'display:none' : '' ?>">
             <a href="#equipment-orders">Equipment Orders</a>
           </li>
-          <li class="tab admin-tab" style="<?= user.role !== 'admin' ? 'display:none' : '' ?>">
+          <li class="tab admin-tab" style="<?!= user.role !== 'admin' ? 'display:none' : '' ?>">
             <a href="#admin-panel">Admin Panel</a>
           </li>
         </ul>
       </div>
     </nav>
-    
-    <!-- Mobile Navigation Menu -->
+
     <ul class="sidenav" id="mobile-nav">
-      <li>
-        <div class="sidenav-header">
-          <h5>Order Management</h5>
-        </div>
-      </li>
+      <li><div class="sidenav-header"><h5>Order Management</h5></div></li>
       <li>
         <div class="user-info">
-          <p><b>Welcome, <?= user.firstName ?> <?= user.lastName ?></b></p>
-          <p class="grey-text"><?= user.role === 'admin' ? 'Administrator' : 'Standard User' ?></p>
+          <p><b>Welcome, <?!= user.firstName ?> <?!= user.lastName ?></b></p>
+          <p class="grey-text"><?!= user.role === 'admin' ? 'Administrator' : 'Standard User' ?></p>
         </div>
       </li>
       <li><a href="#dashboard"><i class="material-icons">dashboard</i>Dashboard</a></li>
       <li><a href="#material-orders"><i class="material-icons">shopping_cart</i>Material Orders</a></li>
-      
       <? if (user.role === 'admin') { ?>
-      <li><a href="#equipment-orders"><i class="material-icons">build</i>Equipment Orders</a></li>
-      <li><a href="#admin-panel"><i class="material-icons">settings</i>Admin Panel</a></li>
+        <li><a href="#equipment-orders"><i class="material-icons">build</i>Equipment Orders</a></li>
+        <li><a href="#admin-panel"><i class="material-icons">settings</i>Admin Panel</a></li>
       <? } ?>
-      
       <li><div class="divider"></div></li>
       <li><a href="#" id="mobileLogoutBtn"><i class="material-icons">exit_to_app</i>Logout</a></li>
     </ul>
-    
-    <!-- Notification Container -->
+
     <div id="notification"></div>
-    
-    <!-- Main Content -->
+
     <main>
-      <!-- Dashboard Tab -->
       <div id="dashboard" class="container">
-        <h4>Welcome, <?= user.firstName ?> <?= user.lastName ?></h4>
-        <p class="grey-text">Role: <?= user.role === 'admin' ? 'Administrator' : 'Standard User' ?></p>
-        
+        <h4>Welcome, <?!= user.firstName ?> <?!= user.lastName ?></h4>
+        <p class="grey-text">Role: <?!= user.role === 'admin' ? 'Administrator' : 'Standard User' ?></p>
+
         <div class="row">
-          <div class="col s12">
-            <h5>Quick Access</h5>
-          </div>
-          
-          <!-- Material Order Module -->
+          <div class="col s12"><h5>Quick Access</h5></div>
+
           <div class="col s12 m6 l4">
             <div class="card module-card hoverable" data-module="material-orders">
               <i class="material-icons">shopping_cart</i>
               <h5>Material Orders</h5>
             </div>
           </div>
-          
-          <!-- Equipment Ordering Module (Admin Only) -->
-          <div class="col s12 m6 l4 <?= user.role !== 'admin' ? 'hide' : '' ?>">
+
+          <div class="col s12 m6 l4 <?!= user.role !== 'admin' ? 'hide' : '' ?>">
             <div class="card module-card hoverable admin-only" data-module="equipment-orders">
               <span class="admin-badge">Admin</span>
               <i class="material-icons">build</i>
               <h5>Equipment Orders</h5>
             </div>
           </div>
-          
-          <!-- Admin Panel (Admin Only) -->
-          <div class="col s12 m6 l4 <?= user.role !== 'admin' ? 'hide' : '' ?>">
+
+          <div class="col s12 m6 l4 <?!= user.role !== 'admin' ? 'hide' : '' ?>">
             <div class="card module-card hoverable admin-only" data-module="admin-panel">
               <span class="admin-badge">Admin</span>
               <i class="material-icons">settings</i>
@@ -166,43 +124,28 @@
             </div>
           </div>
         </div>
-        
-        <!-- Recent Activity Section -->
+
         <div class="row">
-          <div class="col s12">
-            <h5>Recent Activity</h5>
-            <p class="grey-text">No recent activity to display.</p>
-          </div>
+          <div class="col s12"><h5>Recent Activity</h5>
+          <p class="grey-text">No recent activity to display.</p></div>
         </div>
       </div>
-      
-      <!-- Material Orders Tab -->
+
       <div id="material-orders" class="container">
         <h4>Material Orders</h4>
         <p>Manage material orders for your projects</p>
-        
-        <!-- Material Order Form will be included here -->
-        <div id="material-order-form">
-          <?!= include('MaterialOrderForm'); ?>
-        </div>
+        <div id="material-order-form"><?!= include('MaterialOrderForm'); ?></div>
       </div>
-      
-      <!-- Equipment Orders Tab (Admin Only) -->
+
       <div id="equipment-orders" class="container">
         <h4>Equipment Orders</h4>
         <p>Manage wallcovering equipment orders</p>
-        
-        <!-- Content will be loaded once developed -->
-        <div class="card-panel">
-          <span>Equipment ordering module is under development. Check back soon!</span>
-        </div>
+        <div class="card-panel"><span>Equipment ordering module is under development. Check back soon!</span></div>
       </div>
-      
-      <!-- Admin Panel Tab (Admin Only) -->
+
       <div id="admin-panel" class="container">
         <h4>Admin Panel</h4>
         <p>Manage system settings and user accounts</p>
-        
         <div class="row">
           <div class="col s12 m6">
             <div class="card">
@@ -215,7 +158,6 @@
               </div>
             </div>
           </div>
-          
           <div class="col s12 m6">
             <div class="card">
               <div class="card-content">
@@ -230,137 +172,94 @@
         </div>
       </div>
     </main>
-    
-    <!-- Footer -->
+
     <footer class="page-footer">
-      <div class="footer-copyright">
-        <div class="container">
-          © 2025 Order Management System
-          <a class="grey-text text-lighten-4 right" href="#!">Help</a>
-        </div>
+      <div class="container">
+        © 2025 Order Management System
+        <a class="grey-text text-lighten-4 right" href="#!">Help</a>
       </div>
     </footer>
-    <!-- In the head section -->
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script>
-      // Store user data
       const user = <?!= JSON.stringify(user) ?>;
-      
-      // Initialize components
-      document.addEventListener('DOMContentLoaded', function() {
-        // Initialize sidenav
-        const sidenav = document.querySelectorAll('.sidenav');
-        M.Sidenav.init(sidenav);
-        
-        // Initialize tabs
-        const tabs = document.querySelectorAll('.tabs');
-        M.Tabs.init(tabs);
-        
-        // Add event listeners for module cards
-        const moduleCards = document.querySelectorAll('.module-card');
-        moduleCards.forEach(card => {
-          card.addEventListener('click', function() {
+      console.log("Logged in as:", user.firstName);
+
+      document.addEventListener('DOMContentLoaded', function () {
+        M.Sidenav.init(document.querySelectorAll('.sidenav'));
+        M.Tabs.init(document.querySelectorAll('.tabs'));
+
+        document.querySelectorAll('.module-card').forEach(card => {
+          card.addEventListener('click', function () {
             const moduleId = this.getAttribute('data-module');
-            const tabElement = document.querySelector(`a[href="#${moduleId}"]`);
             const tabInstance = M.Tabs.getInstance(document.querySelector('.tabs'));
-            
-            if (tabElement && tabInstance) {
-              tabInstance.select(moduleId);
-            }
+            if (tabInstance) tabInstance.select(moduleId);
           });
         });
-        
-        // Handle logout
+
         document.getElementById('logoutBtn').addEventListener('click', handleLogout);
         document.getElementById('mobileLogoutBtn').addEventListener('click', handleLogout);
-        
-        // Handle admin actions
-        const adminActions = document.querySelectorAll('.admin-action');
-        adminActions.forEach(action => {
-          action.addEventListener('click', function(e) {
+
+        document.querySelectorAll('.admin-action').forEach(action => {
+          action.addEventListener('click', function (e) {
             e.preventDefault();
-            const actionType = this.getAttribute('data-action');
-            handleAdminAction(actionType);
+            handleAdminAction(this.getAttribute('data-action'));
           });
         });
-        
-        // Check user role for access control
+
         checkUserPermissions();
       });
-      
-      // Validate user permissions
+
       function checkUserPermissions() {
-        // Hide admin-only sections if user is not an admin
         if (user.role !== 'admin') {
-          const adminTabs = document.querySelectorAll('.admin-tab');
-          adminTabs.forEach(tab => {
-            tab.style.display = 'none';
-          });
-          
-          // Also redirect if on admin page directly
+          document.querySelectorAll('.admin-tab').forEach(tab => tab.style.display = 'none');
           const currentTab = window.location.hash;
           if (currentTab === '#equipment-orders' || currentTab === '#admin-panel') {
             window.location.hash = '#dashboard';
           }
         }
       }
-      
-      // Handle admin actions
+
       function handleAdminAction(action) {
         if (user.role !== 'admin') {
           showNotification('Access denied. Admin privileges required.', 'red');
           return;
         }
-        
         switch (action) {
           case 'user-management':
-            // Load user management interface
             showNotification('User management module loading...', 'blue');
-            // Implement actual functionality
             break;
           case 'system-config':
-            // Load system configuration interface
             showNotification('System configuration module loading...', 'blue');
-            // Implement actual functionality
             break;
           default:
             showNotification('Unknown action', 'red');
         }
       }
-      
-      // Show notification
+
       function showNotification(message, color = 'green') {
         const notification = document.getElementById('notification');
         notification.textContent = message;
         notification.style.backgroundColor = color;
         notification.style.display = 'block';
-        
-        // Hide after 3 seconds
-        setTimeout(() => {
-          notification.style.display = 'none';
-        }, 3000);
+        setTimeout(() => notification.style.display = 'none', 3000);
       }
-      
-      // Handle logout
-      function handleLogout() {
-        // Call server-side logout function
-        google.script.run
-          .withSuccessHandler(function(response) {
-            if (response.success) {
-              // Clear session storage
-              sessionStorage.removeItem('user');
-              
-              // Redirect to login page
-              window.top.location.href = '?logout=true';
-            } else {
-              showNotification('Logout failed: ' + response.message, 'red');
-            }
-          })
-          .withFailureHandler(function(error) {
-            showNotification('Error during logout: ' + error.message, 'red');
-          })
-          .logout(user.sessionToken);
+function handleLogout() {
+  google.script.run
+    .withSuccessHandler(function (response) {
+      if (response.success) {
+        sessionStorage.removeItem('user');
+        // Use the full URL instead of just the parameter
+        window.top.location.href = "https://script.google.com/macros/s/AKfycbxYDPG9ZQ9CMrrNSR3fHdXnKcMiy9bmQx_DXn1n-kEC_XgLqV6Xmzlw65rOjsx350Ye/exec?logout=true";
+      } else {
+        showNotification('Logout failed: ' + response.message, 'red');
       }
+    })
+    .withFailureHandler(function (error) {
+      showNotification('Error during logout: ' + error.message, 'red');
+    })
+    .logout(user.sessionToken);
+}
     </script>
   </body>
 </html>
