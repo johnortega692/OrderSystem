@@ -16,29 +16,7 @@ const PRODUCTS_SHEET_NAME = "Products";
 // Template document ID for PDF generation
 const TEMPLATE_DOC_ID = "REPLACE_WITH_YOUR_DOC_ID";
 
-// Temporary implementation to return mock job numbers
-function getJobNumbers() {
-  return [
-    {number: "J001", name: "Sample Job 1"},
-    {number: "J002", name: "Sample Job 2"}
-  ];
-}
 
-// Temporary implementation to return mock vendors
-function getVendors() {
-  return [
-    {id: "V001", name: "Vendor 1"},
-    {id: "V002", name: "Vendor 2"}
-  ];
-}
-
-// Temporary implementation to return mock products
-function getProducts(vendorId, category) {
-  return [
-    {id: "P001", name: "Product 1"},
-    {id: "P002", name: "Product 2"}
-  ];
-}
 
 // Temporary implementation for order submission
 function submitMaterialOrder(orderData) {
