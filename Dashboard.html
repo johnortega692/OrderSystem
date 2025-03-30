@@ -185,7 +185,7 @@
     google.script.run
       .withSuccessHandler(updateDashboard)
       .withFailureHandler(handleLoadError)
-      .getDashboardData(user.email, user.role === 'admin');
+      .getDashboardData(loggedInUser.email, loggedInUser.role === 'admin');
   }
   
   // Update dashboard with data
