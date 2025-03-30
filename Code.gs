@@ -5,23 +5,24 @@ const USER_SHEET_ID = "16OcYrzU_dGadybhZXaxFul6JO-h7v8lFW2XkqdweQpE";
 const USER_SHEET_NAME = "Users";
 const SESSION_DURATION_HOURS = 4;
 
-// Function to serve the login page
 function doGet(e) {
-  // Check if user has active session
-  const sessionToken = getSessionToken(e);
-  if (sessionToken) {
-    const user = validateSession(sessionToken);
-    if (user) {
-      return loadMainApp(user);
-    }
+  const token = getSessionToken(e);
+  const user = validateSession(token);
+
+  if (user) {
+    const template = HtmlService.createTemplateFromFile('MainApp');
+    template.user = user; // ✅ This line injects `user` into the HTML
+    return template.evaluate().setTitle('Order Management');
+  } else {
+    return HtmlService.createHtmlOutputFromFile('Login').setTitle('Login');
   }
-  
-  // No valid session, serve login page
-  return HtmlService.createTemplateFromFile('Login')
-    .evaluate()
-    .setTitle('Order Management System - Login')
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
+
+
+
+
+
+
 // Process login attempt
 function processLogin(username, password) {
   try {
@@ -186,9 +187,10 @@ function validateSession(token) {
 
 function loadMainApp(user) {
   return HtmlService.createHtmlOutput(
-    "<html><body><h1>Dashboard</h1><p>Welcome, " + user.firstName + "!</p><p>Your role is: " + user.role + "</p></body></html>"
-  )
-  .setTitle('Order Management System');
+    "<html><body><h1>Welcome to Order Management</h1><p>Hello, " + 
+    user.firstName + "!</p><p>Your role is: " + user.role + 
+    "</p><p>This is a test page.</p></body></html>"
+  ).setTitle('Order Management System');
 }
 // Check if user has admin role
 function isAdmin(user) {
@@ -228,14 +230,10 @@ function logout(sessionToken) {
   }
 }
 
-
+// Add to MaterialOrderService.gs
 function getDashboardData(userEmail, isAdmin) {
   return {
-    orderStats: {
-      totalOrders: 0,
-      pendingOrders: 0,
-      completedOrders: 0
-    },
+    orderStats: { totalOrders: 0, pendingOrders: 0, completedOrders: 0 },
     recentOrders: [],
     topJobs: [],
     monthlyActivity: []
@@ -246,14 +244,14 @@ function getOrderDetails(orderNumber) {
   return {
     header: {
       OrderNumber: "TEST-001",
-      OrderDate: new Date().toLocaleDateString(),
-      Status: "Submitted",
+      OrderDate: new Date().toLocaleString(),
+      Status: "Test",
       JobNumber: "J001",
       JobName: "Test Job",
       VendorName: "Test Vendor",
       UserName: "Test User",
-      DeliveryType: "Will Call",
-      Notes: "Test order"
+      DeliveryType: "Test",
+      Notes: ""
     },
     items: []
   };
@@ -261,4 +259,32 @@ function getOrderDetails(orderNumber) {
 
 function getOrderPdf(orderNumber) {
   return null;
+}
+
+function getJobNumbers() {
+  return [
+    {number: "J001", name: "Sample Job 1"},
+    {number: "J002", name: "Sample Job 2"}
+  ];
+}
+
+function getVendors() {
+  return [
+    {id: "V001", name: "Vendor 1"},
+    {id: "V002", name: "Vendor 2"}
+  ];
+}
+
+function getProducts(vendorId, category) {
+  return [
+    {id: "P001", name: "Product 1"},
+    {id: "P002", name: "Product 2"}
+  ];
+}
+
+function submitMaterialOrder(orderData) {
+  return {
+    success: true,
+    orderNumber: "ORD-" + new Date().getTime().toString().substr(-6)
+  };
 }
