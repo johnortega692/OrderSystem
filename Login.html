@@ -45,9 +45,7 @@
           <div class="login-logo">
             <h4>Order Management System</h4>
           </div>
-          
           <div id="errorMessage"></div>
-          
           <div class="row">
             <form class="col s12" id="loginForm">
               <div class="row">
@@ -76,49 +74,43 @@
         </div>
       </div>
     </main>
-    
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script>
-      // Initialize Materialize components
-      document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener('DOMContentLoaded', function () {
         M.AutoInit();
       });
-      
-      // Handle login form submission
-      document.getElementById('loginForm').addEventListener('submit', function(e) {
+
+      document.getElementById('loginForm').addEventListener('submit', function (e) {
         e.preventDefault();
-        
+
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
-        
-        // Display loading indication
+
         document.querySelector('.login-btn').disabled = true;
         document.querySelector('.login-btn').innerHTML = 'Logging in... <i class="material-icons right">hourglass_empty</i>';
-        
-        // Call server-side function to process login
+
         google.script.run
           .withSuccessHandler(handleLoginSuccess)
           .withFailureHandler(handleLoginFailure)
           .processLogin(username, password);
       });
-      
-      // Handle successful login
+
       function handleLoginSuccess(response) {
-        if (response.success) {
-          // Store user data in session storage
+        if (response.success && response.user && response.user.sessionToken) {
           sessionStorage.setItem('user', JSON.stringify(response.user));
-          
-          // Redirect to main app with session token
-          window.top.location.href = '?token=' + response.user.sessionToken;
+
+          // 🔥 Use your actual Web App URL below:
+          const webAppUrl = "https://script.google.com/macros/s/AKfycbxYDPG9ZQ9CMrrNSR3fHdXnKcMiy9bmQx_DXn1n-kEC_XgLqV6Xmzlw65rOjsx350Ye/exec";
+          window.top.location.href = webAppUrl + "?token=" + encodeURIComponent(response.user.sessionToken);
+
         } else {
-          // Display error message
-          document.getElementById('errorMessage').innerText = response.message;
+          document.getElementById('errorMessage').innerText = response.message || "Login failed.";
           document.querySelector('.login-btn').disabled = false;
           document.querySelector('.login-btn').innerHTML = 'Login <i class="material-icons right">send</i>';
         }
       }
-      
-      // Handle login failure
+
       function handleLoginFailure(error) {
         document.getElementById('errorMessage').innerText = "Error: " + error.message;
         document.querySelector('.login-btn').disabled = false;
